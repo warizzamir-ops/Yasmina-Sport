@@ -103,7 +103,7 @@
 
 <div id="loading-screen">
     <div class="loader"></div>
-    <p style="font-size: 12px; font-weight: 600; color: var(--accent-rose-dark); letter-spacing: 1px; text-transform: uppercase;">Initialisation...</p>
+    <p style="font-size: 12px; font-weight: 600; color: var(--accent-rose-dark); letter-spacing: 1px; text-transform: uppercase;">Synchronisation Cloud...</p>
 </div>
 
 <div id="app-container">
@@ -238,19 +238,21 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, addDoc, query, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// Check environment variables safely
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'yasmina-sync-2026';
-let db, auth;
+// --- CONFIGURATION FIREBASE YASMINA ---
+const firebaseConfig = {
+  apiKey: "AIzaSyCs-GAypp1_cg2Yz39lUBp8qmvK_LFSNfs",
+  authDomain: "yasminasport-93a99.firebaseapp.com",
+  projectId: "yasminasport-93a99",
+  storageBucket: "yasminasport-93a99.firebasestorage.app",
+  messagingSenderId: "380257418693",
+  appId: "1:380257418693:web:de0cc7440f643f4e27dfac"
+};
 
-if (firebaseConfig) {
-    const app_fb = initializeApp(firebaseConfig);
-    auth = getAuth(app_fb);
-    db = getFirestore(app_fb);
-}
+const app_fb = initializeApp(firebaseConfig);
+const db = getFirestore(app_fb);
+const appId = 'yasmina-sync-2026';
 
 const appModule = (function() {
     const START_DATE = new Date('2026-04-20');
@@ -291,7 +293,8 @@ const appModule = (function() {
 
     const QUOTES = ["Discipline et douceur.", "Un pas après l'autre.", "Force et sérénité.", "Ton futur moi te remercie."];
 
-    let state = { user: null, onboarded: false, ddr: null, weight: [], validations: [], exerciseHistory: {}, lowEnergy: false, currentPhase: null, dayOfCycle: 0, overrideWorkout: 'auto' };
+    // Utilisation de l'identifiant unique comme demandé
+    let state = { user: { uid: "utilisateur_unique_amir" }, onboarded: false, ddr: null, weight: [], validations: [], exerciseHistory: {}, lowEnergy: false, currentPhase: null, dayOfCycle: 0, overrideWorkout: 'auto' };
 
     function showToast(msg) { 
         const t = document.getElementById('toast'); 
@@ -437,36 +440,14 @@ const appModule = (function() {
     }
 
     async function init() {
-        // Safe check for local vs preview mode
-        if (!firebaseConfig) {
-            document.getElementById('loading-screen').innerHTML = "<div style='padding:20px; text-align:center;'><p>Note : Le cloud est désactivé en local.</p><br><button class='btn btn-primary' onclick='document.getElementById(\"loading-screen\").style.display=\"none\"'>Ouvrir l'application</button></div>";
-            updateDashboard(); renderWorkout(); renderCalendar();
-            return;
-        }
-
-        try {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
-            
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    state.user = user;
-                    const idDisplay = document.getElementById('user-id-display');
-                    if(idDisplay) idDisplay.innerText = `ID: ${user.uid}`;
-                    setupListeners();
-                }
-            });
-        } catch (error) {
-            console.error("Auth init error:", error);
-            document.getElementById('loading-screen').style.display = 'none';
-        }
+        // Chargement immédiat car le login est simulé avec le UID fourni
+        const uid = state.user.uid;
+        const idDisplay = document.getElementById('user-id-display');
+        if(idDisplay) idDisplay.innerText = `ID: ${uid}`;
+        setupListeners();
     }
 
     function setupListeners() {
-        if (!state.user || !db) return;
         const uid = state.user.uid;
 
         onSnapshot(doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data'), (snap) => {
@@ -476,7 +457,10 @@ const appModule = (function() {
                 state.onboarded = data.onboarded;
                 state.lowEnergy = data.lowEnergy || false;
                 document.getElementById('onboarding').style.display = 'none';
-                updateCycle(); updateDashboard(); renderWorkout(); renderCalendar();
+                updateCycle();
+                updateDashboard();
+                renderWorkout();
+                renderCalendar();
             } else {
                 document.getElementById('onboarding').style.display = 'flex';
                 document.getElementById('loading-screen').style.display = 'none';
@@ -495,9 +479,12 @@ const appModule = (function() {
                 if (!history[data.exerciseId]) history[data.exerciseId] = [];
                 history[data.exerciseId].push(data);
             });
-            Object.keys(history).forEach(key => { history[key].sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp)); });
+            Object.keys(history).forEach(key => {
+                history[key].sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+            });
             state.exerciseHistory = history;
-            populateExerciseSelect(); renderWorkout();
+            populateExerciseSelect();
+            renderWorkout();
         });
 
         onSnapshot(collection(db, 'artifacts', appId, 'users', uid, 'validations'), (snap) => {
@@ -512,12 +499,9 @@ const appModule = (function() {
         nextOnboarding: (s) => { if(s===2){document.getElementById('ob-step-1').classList.add('hidden'); document.getElementById('ob-step-2').classList.remove('hidden');}},
         finishOnboarding: async () => {
             const d=document.getElementById('input-ddr').value;
-            if(d && state.user && db){
-                await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'profile', 'data'), { ddr: d, onboarded: true, lowEnergy: false });
-            } else if (d) { // Offline mode fallback
-                state.ddr = d; state.onboarded = true;
-                document.getElementById('onboarding').style.display = 'none';
-                updateCycle(); updateDashboard(); renderWorkout(); renderCalendar();
+            if(d){
+                const uid = state.user.uid;
+                await setDoc(doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data'), { ddr: d, onboarded: true, lowEnergy: false });
             }
         },
         switchTab: (t, el) => {
@@ -530,24 +514,22 @@ const appModule = (function() {
         },
         toggleLowEnergy: async (v) => {
             state.lowEnergy = v;
-            if (state.user && db) await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'profile', 'data'), { lowEnergy: v }, { merge: true });
+            await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'profile', 'data'), { lowEnergy: v }, { merge: true });
             renderWorkout();
         },
         selectWorkoutType: (t) => { state.overrideWorkout=t; document.querySelectorAll('.pill').forEach(p => p.classList.toggle('active', p.id===`pill-${t}`)); renderWorkout(); },
         confirmNewCycle: async () => {
             const newDdr = new Date().toISOString().split('T')[0];
-            if (state.user && db) await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'profile', 'data'), { ddr: newDdr }, { merge: true });
-            else state.ddr = newDdr;
+            await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'profile', 'data'), { ddr: newDdr }, { merge: true });
             document.getElementById('modal-rules').style.display = 'none';
-            updateCycle(); updateDashboard(); showToast("Cycle à jour");
+            showToast("Cycle à jour");
         },
         saveExWeight: async (id, name) => {
             const i=document.getElementById(`w-${id}`);
             if(i && i.value){
-                if (state.user && db) {
-                    await addDoc(collection(db, 'artifacts', appId, 'users', state.user.uid, 'exercise_history'), { exerciseId: id, name: name, weight: i.value, timestamp: new Date().toISOString(), date: new Date().toLocaleDateString('fr-FR') });
-                }
-                i.value=""; showToast("Performance notée");
+                await addDoc(collection(db, 'artifacts', appId, 'users', state.user.uid, 'exercise_history'), { exerciseId: id, name: name, weight: i.value, timestamp: new Date().toISOString(), date: new Date().toLocaleDateString('fr-FR') });
+                i.value="";
+                showToast("Performance notée");
             }
         },
         showExerciseHistory: (id) => { 
@@ -558,22 +540,24 @@ const appModule = (function() {
         saveBodyWeight: async () => {
             const i=document.getElementById('body-weight-input');
             if(i && i.value){
-                if (state.user && db) {
-                    await addDoc(collection(db, 'artifacts', appId, 'users', state.user.uid, 'weight_history'), { val: parseFloat(i.value), date: new Date().toISOString() });
-                }
-                i.value=""; showToast("Poids enregistré");
+                await addDoc(collection(db, 'artifacts', appId, 'users', state.user.uid, 'weight_history'), { val: parseFloat(i.value), date: new Date().toISOString() });
+                i.value="";
+                showToast("Poids enregistré");
             }
         },
         toggleDayValidation: async (dateStr) => {
-            if (!state.user || !db) return;
             const uid = state.user.uid;
             const validationsRef = collection(db, 'artifacts', appId, 'users', uid, 'validations');
             if (state.validations.includes(dateStr)) {
                 try {
                     const q = query(validationsRef, where("date", "==", dateStr));
                     const querySnapshot = await getDocs(q);
-                    querySnapshot.forEach(async (d) => { await deleteDoc(doc(db, 'artifacts', appId, 'users', uid, 'validations', d.id)); });
-                } catch (err) { console.error("Delete validation error:", err); }
+                    querySnapshot.forEach(async (d) => {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'users', uid, 'validations', d.id));
+                    });
+                } catch (err) {
+                    console.error("Delete validation error:", err);
+                }
             } else {
                 await addDoc(validationsRef, { date: dateStr });
                 showToast("Journée validée ! ✨");
