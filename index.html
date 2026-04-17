@@ -103,7 +103,7 @@
 
 <div id="loading-screen">
     <div class="loader"></div>
-    <p style="font-size: 12px; font-weight: 600; color: var(--accent-rose-dark); letter-spacing: 1px; text-transform: uppercase;">Synchronisation Cloud...</p>
+    <p style="font-size: 12px; font-weight: 600; color: var(--accent-rose-dark); letter-spacing: 1px; text-transform: uppercase;">Cloud Yasmina...</p>
 </div>
 
 <div id="app-container">
@@ -240,7 +240,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, addDoc, query, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// --- CONFIGURATION FIREBASE YASMINA ---
+// --- CONFIGURATION FIREBASE PERSONNELLE YASMINA ---
 const firebaseConfig = {
   apiKey: "AIzaSyCs-GAypp1_cg2Yz39lUBp8qmvK_LFSNfs",
   authDomain: "yasminasport-93a99.firebaseapp.com",
@@ -293,7 +293,7 @@ const appModule = (function() {
 
     const QUOTES = ["Discipline et douceur.", "Un pas après l'autre.", "Force et sérénité.", "Ton futur moi te remercie."];
 
-    // Utilisation de l'identifiant unique comme demandé
+    // IDENTIFIANT UNIQUE YASMINA
     let state = { user: { uid: "utilisateur_unique_amir" }, onboarded: false, ddr: null, weight: [], validations: [], exerciseHistory: {}, lowEnergy: false, currentPhase: null, dayOfCycle: 0, overrideWorkout: 'auto' };
 
     function showToast(msg) { 
@@ -403,7 +403,11 @@ const appModule = (function() {
 
     function renderWeightChart() {
         const svg = document.getElementById('weight-chart'); if(!svg || state.weight.length < 2) return;
-        const w=380, h=150, p=20; const maxW=110, minW=75;
+        const w=380, h=150, p=20; 
+        const values = state.weight.map(d => d.val);
+        const maxW = Math.max(...values, 102) + 2;
+        const minW = Math.min(...values, 80) - 2;
+        
         const pts = state.weight.map((d, i) => {
             const x = (i/(state.weight.length-1))*(w-2*p)+p;
             const y = h-((parseFloat(d.val)-minW)/(maxW-minW))*(h-2*p)-p;
@@ -439,12 +443,27 @@ const appModule = (function() {
         all.forEach(ex => { if(!unique.has(ex.id)){ const o=document.createElement('option'); o.value=ex.id; o.innerText=ex.nom; if(ex.id === currentVal) o.selected = true; sel.appendChild(o); unique.add(ex.id); }});
     }
 
+    // FONCTION RAFRAÎCHISSEMENT GRAPHIQUE (ADAPTÉE POUR SVG)
+    async function refreshChart() {
+        const uid = state.user.uid;
+        const weightRef = collection(db, 'artifacts', appId, 'users', uid, 'weight_history');
+        const querySnapshot = await getDocs(weightRef);
+        
+        let dataPoints = [];
+        querySnapshot.forEach((doc) => { dataPoints.push(doc.data()); });
+        dataPoints.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        state.weight = dataPoints;
+        renderWeightChart();
+    }
+
     async function init() {
-        // Chargement immédiat car le login est simulé avec le UID fourni
         const uid = state.user.uid;
         const idDisplay = document.getElementById('user-id-display');
         if(idDisplay) idDisplay.innerText = `ID: ${uid}`;
         setupListeners();
+        // Premier chargement des graphiques
+        refreshChart();
     }
 
     function setupListeners() {
@@ -467,8 +486,9 @@ const appModule = (function() {
             }
         });
 
+        // Le listener temps réel s'occupe déjà du rafraîchissement
         onSnapshot(collection(db, 'artifacts', appId, 'users', uid, 'weight_history'), (snap) => {
-            state.weight = snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a,b) => new Date(a.date) - new Date(b.date));
+            state.weight = snap.docs.map(d => d.data()).sort((a,b) => new Date(a.date) - new Date(b.date));
             renderWeightChart();
         });
 
@@ -538,11 +558,17 @@ const appModule = (function() {
             let h="<div style='margin-top:15px;'>"; [...state.exerciseHistory[id]].reverse().forEach(e => h+=`<div class='history-item'><span>${e.date}</span><span style='font-weight:700;'>${e.weight} kg</span></div>`); c.innerHTML=h+"</div>"; 
         },
         saveBodyWeight: async () => {
-            const i=document.getElementById('body-weight-input');
-            if(i && i.value){
-                await addDoc(collection(db, 'artifacts', appId, 'users', state.user.uid, 'weight_history'), { val: parseFloat(i.value), date: new Date().toISOString() });
-                i.value="";
-                showToast("Poids enregistré");
+            const i = document.getElementById('body-weight-input');
+            if (i && i.value) {
+                const uid = state.user.uid;
+                await addDoc(collection(db, 'artifacts', appId, 'users', uid, 'weight_history'), { 
+                    val: parseFloat(i.value), 
+                    date: new Date().toISOString() 
+                });
+                i.value = "";
+                showToast("Enregistré ! ✨");
+                // On rafraîchit le graphique immédiatement
+                refreshChart();
             }
         },
         toggleDayValidation: async (dateStr) => {
@@ -556,7 +582,7 @@ const appModule = (function() {
                         await deleteDoc(doc(db, 'artifacts', appId, 'users', uid, 'validations', d.id));
                     });
                 } catch (err) {
-                    console.error("Delete validation error:", err);
+                    console.error("Delete error:", err);
                 }
             } else {
                 await addDoc(validationsRef, { date: dateStr });
