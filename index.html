@@ -103,7 +103,7 @@
 
 <div id="loading-screen">
     <div class="loader"></div>
-    <p style="font-size: 12px; font-weight: 600; color: var(--accent-rose-dark); letter-spacing: 1px; text-transform: uppercase;">Cloud Yasmina...</p>
+    <p style="font-size: 12px; font-weight: 600; color: var(--accent-rose-dark); letter-spacing: 1px; text-transform: uppercase;">Liaison Cloud Yasmina...</p>
 </div>
 
 <div id="app-container">
@@ -238,7 +238,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, addDoc, query, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, collection, onSnapshot, addDoc, query, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // --- CONFIGURATION FIREBASE PERSONNELLE YASMINA ---
 const firebaseConfig = {
@@ -270,24 +270,24 @@ const appModule = (function() {
             { id: "mobilité", nom: "Mobilité Articulaire", reps: "2 min", note: "Poignets, chevilles, genoux, nuque, épaules.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/09/natarajasana-posture-du-danseur.gif" }
         ],
         haut: [
-            { id: "lat-pulldown", nom: "Tirage Poitrine", reps: "3x12", note: "Imagine toucher tes hanches avec tes coudes.", img: "https://www.docteur-fitness.com/wp-content/uploads/2021/08/tirage-vertical-prise-serree.gif" },
-            { id: "rowing-machine", nom: "Rowing Assis", reps: "3x12", note: "Serrez les omoplates très fort à la fin.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/tirage-horizontal-poulie.gif" },
-            { id: "chest-press", nom: "Développé Assis", reps: "3x15", note: "Dos bien collé au siège.", img: "https://www.docteur-fitness.com/wp-content/uploads/2000/06/developpe-incline-machine-convergente-exercice-musculation.gif" },
-            { id: "shoulder-press", nom: "Presse à Épaules", reps: "3x12", note: "Protection articulations : ne monte pas trop haut.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/11/developpe-epaules-a-la-machine-shoulder-press.gif" }
+            { id: "lat-pulldown", nom: "Tirage Poitrine", reps: "3x12", note: "Coudes vers les hanches.", img: "https://www.docteur-fitness.com/wp-content/uploads/2021/08/tirage-vertical-prise-serree.gif" },
+            { id: "rowing-machine", nom: "Rowing Assis", reps: "3x12", note: "Serrez les omoplates.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/tirage-horizontal-poulie.gif" },
+            { id: "chest-press", nom: "Développé Assis", reps: "3x15", note: "Dos collé au siège.", img: "https://www.docteur-fitness.com/wp-content/uploads/2000/06/developpe-incline-machine-convergente-exercice-musculation.gif" },
+            { id: "shoulder-press", nom: "Presse à Épaules", reps: "3x12", note: "Ne monte pas trop haut.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/11/developpe-epaules-a-la-machine-shoulder-press.gif" }
         ],
         bas: [
-            { id: "leg-press", nom: "Presse à Cuisses", reps: "3x15", note: "Ne verrouillez jamais vos genoux.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/presse-a-cuisses-inclinee.gif" },
-            { id: "leg-extension", nom: "Leg Extension", reps: "3x12", note: "Contrôlez bien la descente du poids.", img: "https://www.docteur-fitness.com/wp-content/uploads/2000/06/leg-extension-exercice-musculation.gif" },
-            { id: "leg-curl", nom: "Leg Curl Allongé", reps: "3x12", note: "Stabiliser le bassin en renforçant l'arrière.", img: "https://www.docteur-fitness.com/wp-content/uploads/2021/10/leg-curl-allonge-ischio-jambiers.jpg" },
-            { id: "adductors", nom: "Adducteurs Machine", reps: "2x15", note: "Mouvement lent et contrôlé.", img: "https://thumbs.dreamstime.com/z/s-exercer-pieds-de-r%C3%A9duction-sur-le-simulateur-pour-des-adducteurs-56988382.jpg" },
+            { id: "leg-press", nom: "Presse à Cuisses", reps: "3x15", note: "Ne verrouillez pas les genoux.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/presse-a-cuisses-inclinee.gif" },
+            { id: "leg-extension", nom: "Leg Extension", reps: "3x12", note: "Contrôlez bien la descente.", img: "https://www.docteur-fitness.com/wp-content/uploads/2000/06/leg-extension-exercice-musculation.gif" },
+            { id: "leg-curl", nom: "Leg Curl Allongé", reps: "3x12", note: "Stabiliser le bassin.", img: "https://www.docteur-fitness.com/wp-content/uploads/2021/10/leg-curl-allonge-ischio-jambiers.jpg" },
+            { id: "adductors", nom: "Adducteurs Machine", reps: "2x15", note: "Lent et contrôlé.", img: "https://thumbs.dreamstime.com/z/s-exercer-pieds-de-r%C3%A9duction-sur-le-simulateur-pour-des-adducteurs-56988382.jpg" },
             { id: "abductors", nom: "Abducteurs Machine", reps: "2x15", note: "Renfort fessiers.", img: "https://static.strengthlevel.com/images/exercises/hip-abduction/hip-abduction-800.jpg" }
         ],
         fullbody: [
             { id: "leg-press-fb", nom: "Presse à Cuisses", reps: "3x15", note: "Focus stabilité.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/presse-a-cuisses-inclinee.gif" },
-            { id: "lat-pulldown-fb", nom: "Tirage Poitrine", reps: "3x12", note: "Ouvrir la cage thoracique.", img: "https://www.docteur-fitness.com/wp-content/uploads/2021/08/tirage-vertical-prise-serree.gif" },
-            { id: "rowing-fb", nom: "Rowing Assis", reps: "3x12", note: "Posture droite.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/tirage-horizontal-poulie.gif" },
+            { id: "lat-pulldown-fb", nom: "Tirage Poitrine", reps: "3x12", img: "https://www.docteur-fitness.com/wp-content/uploads/2021/08/tirage-vertical-prise-serree.gif" },
+            { id: "rowing-fb", nom: "Rowing Assis", reps: "3x12", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/tirage-horizontal-poulie.gif" },
             { id: "dips-machine", nom: "Dips Assistés", reps: "3x12", note: "Focus Triceps.", img: "https://www.docteur-fitness.com/wp-content/uploads/2021/12/dips-assis-machine-avec-poids.gif" },
-            { id: "planche-fb", nom: "Mountain Climber", reps: "3x30s", note: "Aspire le nombril (Vacuum).", img: "https://www.docteur-fitness.com/wp-content/uploads/2000/06/mountain-climber-exercice-musculation.gif" }
+            { id: "planche-fb", nom: "Mountain Climber", reps: "3x30s", note: "Aspire le nombril.", img: "https://www.docteur-fitness.com/wp-content/uploads/2000/06/mountain-climber-exercice-musculation.gif" }
         ]
     };
 
@@ -404,7 +404,7 @@ const appModule = (function() {
     function renderWeightChart() {
         const svg = document.getElementById('weight-chart'); if(!svg || state.weight.length < 2) return;
         const w=380, h=150, p=20; 
-        const values = state.weight.map(d => d.val);
+        const values = state.weight.map(d => parseFloat(d.val));
         const maxW = Math.max(...values, 102) + 2;
         const minW = Math.min(...values, 80) - 2;
         
@@ -443,27 +443,23 @@ const appModule = (function() {
         all.forEach(ex => { if(!unique.has(ex.id)){ const o=document.createElement('option'); o.value=ex.id; o.innerText=ex.nom; if(ex.id === currentVal) o.selected = true; sel.appendChild(o); unique.add(ex.id); }});
     }
 
-    // FONCTION RAFRAÎCHISSEMENT GRAPHIQUE (ADAPTÉE POUR SVG)
-    async function refreshChart() {
+    // FONCTION LECTURE INITIALE
+    async function loadDataOnStart() {
         const uid = state.user.uid;
         const weightRef = collection(db, 'artifacts', appId, 'users', uid, 'weight_history');
-        const querySnapshot = await getDocs(weightRef);
-        
-        let dataPoints = [];
-        querySnapshot.forEach((doc) => { dataPoints.push(doc.data()); });
-        dataPoints.sort((a, b) => new Date(a.date) - new Date(b.date));
-        
-        state.weight = dataPoints;
-        renderWeightChart();
+        const q = query(weightRef);
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+            state.weight = snap.docs.map(d => d.data()).sort((a,b) => new Date(a.date) - new Date(b.date));
+            renderWeightChart();
+        }
     }
 
     async function init() {
         const uid = state.user.uid;
-        const idDisplay = document.getElementById('user-id-display');
-        if(idDisplay) idDisplay.innerText = `ID: ${uid}`;
+        document.getElementById('user-id-display').innerText = `ID: ${uid}`;
         setupListeners();
-        // Premier chargement des graphiques
-        refreshChart();
+        await loadDataOnStart();
     }
 
     function setupListeners() {
@@ -486,7 +482,6 @@ const appModule = (function() {
             }
         });
 
-        // Le listener temps réel s'occupe déjà du rafraîchissement
         onSnapshot(collection(db, 'artifacts', appId, 'users', uid, 'weight_history'), (snap) => {
             state.weight = snap.docs.map(d => d.data()).sort((a,b) => new Date(a.date) - new Date(b.date));
             renderWeightChart();
@@ -520,8 +515,7 @@ const appModule = (function() {
         finishOnboarding: async () => {
             const d=document.getElementById('input-ddr').value;
             if(d){
-                const uid = state.user.uid;
-                await setDoc(doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data'), { ddr: d, onboarded: true, lowEnergy: false });
+                await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'profile', 'data'), { ddr: d, onboarded: true, lowEnergy: false });
             }
         },
         switchTab: (t, el) => {
@@ -560,15 +554,14 @@ const appModule = (function() {
         saveBodyWeight: async () => {
             const i = document.getElementById('body-weight-input');
             if (i && i.value) {
-                const uid = state.user.uid;
-                await addDoc(collection(db, 'artifacts', appId, 'users', uid, 'weight_history'), { 
-                    val: parseFloat(i.value), 
-                    date: new Date().toISOString() 
-                });
+                await addDoc(collection(db, 'artifacts', appId, 'users', state.user.uid, 'weight_history'), { val: parseFloat(i.value), date: new Date().toISOString() });
                 i.value = "";
-                showToast("Enregistré ! ✨");
-                // On rafraîchit le graphique immédiatement
-                refreshChart();
+                showToast("Poids enregistré ! ✨");
+                // On rafraîchit immédiatement le graphique localement
+                const uid = state.user.uid;
+                const snap = await getDocs(query(collection(db, 'artifacts', appId, 'users', uid, 'weight_history')));
+                state.weight = snap.docs.map(d => d.data()).sort((a,b) => new Date(a.date) - new Date(b.date));
+                renderWeightChart();
             }
         },
         toggleDayValidation: async (dateStr) => {
@@ -581,9 +574,7 @@ const appModule = (function() {
                     querySnapshot.forEach(async (d) => {
                         await deleteDoc(doc(db, 'artifacts', appId, 'users', uid, 'validations', d.id));
                     });
-                } catch (err) {
-                    console.error("Delete error:", err);
-                }
+                } catch (err) { console.error("Delete error:", err); }
             } else {
                 await addDoc(validationsRef, { date: dateStr });
                 showToast("Journée validée ! ✨");
