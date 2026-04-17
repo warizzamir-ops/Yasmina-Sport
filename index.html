@@ -73,7 +73,7 @@
         .progression-select { width: 100%; padding: 12px; border-radius: 14px; border: 1px solid var(--border); font-family: 'Outfit'; margin-bottom: 20px; background: white; color: var(--text-primary); font-size: 15px; }
         .history-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 
-        .chart-container { height: 160px; width: 100%; margin: 10px 0; position: relative; }
+        .chart-container { height: 180px; width: 100%; margin: 10px 0; position: relative; }
         .pill { padding: 8px 16px; border-radius: 12px; background: white; border: 1px solid var(--border); font-size: 12px; font-weight: 500; color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
         .pill.active { background: var(--accent-rose); color: white; border-color: var(--accent-rose); }
         
@@ -199,8 +199,8 @@
                 <select id="exercise-select" class="progression-select" onchange="window.app.showExerciseHistory(this.value)">
                     <option value="">-- Choisir un exercice --</option>
                 </select>
-                <div id="force-chart-container" class="chart-container hidden">
-                    <svg id="force-chart-svg" style="width: 100%; height: 160px;"></svg>
+                <div id="force-chart-container" class="chart-container hidden" style="height:220px;">
+                    <svg id="force-chart-svg" style="width: 100%; height: 100%;"></svg>
                 </div>
                 <div id="exercise-history-container">
                     <div class="text-center text-secondary text-xs opacity-50 py-10">Sélectionnez un exercice</div>
@@ -212,7 +212,7 @@
         <section id="tab-progress-weight" class="tab-content hidden">
             <div class="card">
                 <h3>Courbe de Poids</h3>
-                <div class="chart-container"><svg id="weight-chart" style="width: 100%; height: 150px;"></svg></div>
+                <div class="chart-container" style="height:220px;"><svg id="weight-chart" style="width: 100%; height: 100%;"></svg></div>
                 <div class="flex-between text-xs text-secondary mt-2"><span>Départ: 102kg</span><span>Objectif: 82-88kg</span></div>
             </div>
             <div class="card">
@@ -270,16 +270,16 @@ const appModule = (function() {
             { id: "mobilité", nom: "Mobilité Articulaire", reps: "2 min", note: "Poignets, chevilles, genoux, nuque, épaules.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/09/natarajasana-posture-du-danseur.gif" }
         ],
         haut: [
-            { id: "lat-pulldown", nom: "Tirage Poitrine", reps: "3x12", note: "Coudes vers les hanches.", img: "https://www.docteur-fitness.com/wp-content/uploads/2021/08/tirage-vertical-prise-serree.gif" },
+            { id: "lat-pulldown", nom: "Tirage Poitrine", reps: "3x12", note: "Imagine toucher tes hanches avec tes coudes.", img: "https://www.docteur-fitness.com/wp-content/uploads/2021/08/tirage-vertical-prise-serree.gif" },
             { id: "rowing-machine", nom: "Rowing Assis", reps: "3x12", note: "Serrez les omoplates.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/02/tirage-horizontal-poulie.gif" },
-            { id: "chest-press", nom: "Développé Assis", reps: "3x15", note: "Dos collé au siège.", img: "https://www.docteur-fitness.com/wp-content/uploads/2000/06/developpe-incline-machine-convergente-exercice-musculation.gif" },
+            { id: "chest-press", nom: "Développé Assis", reps: "3x15", note: "Dos bien collé au siège.", img: "https://www.docteur-fitness.com/wp-content/uploads/2000/06/developpe-incline-machine-convergente-exercice-musculation.gif" },
             { id: "shoulder-press", nom: "Presse à Épaules", reps: "3x12", note: "Ne monte pas trop haut.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/11/developpe-epaules-a-la-machine-shoulder-press.gif" }
         ],
         bas: [
-            { id: "leg-press", nom: "Presse à Cuisses", reps: "3x15", note: "Ne verrouillez pas les genoux.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/presse-a-cuisses-inclinee.gif" },
+            { id: "leg-press", nom: "Presse à Cuisses", reps: "3x15", note: "Ne verrouillez jamais vos genoux.", img: "https://www.docteur-fitness.com/wp-content/uploads/2022/08/presse-a-cuisses-inclinee.gif" },
             { id: "leg-extension", nom: "Leg Extension", reps: "3x12", note: "Contrôlez bien la descente.", img: "https://www.docteur-fitness.com/wp-content/uploads/2000/06/leg-extension-exercice-musculation.gif" },
             { id: "leg-curl", nom: "Leg Curl Allongé", reps: "3x12", note: "Stabiliser le bassin.", img: "https://www.docteur-fitness.com/wp-content/uploads/2021/10/leg-curl-allonge-ischio-jambiers.jpg" },
-            { id: "adductors", nom: "Adducteurs Machine", reps: "2x15", note: "Lent et contrôlé.", img: "https://thumbs.dreamstime.com/z/s-exercer-pieds-de-r%C3%A9duction-sur-le-simulateur-pour-des-adducteurs-56988382.jpg" },
+            { id: "adductors", nom: "Adducteurs Machine", reps: "2x15", note: "Mouvement lent et contrôlé.", img: "https://thumbs.dreamstime.com/z/s-exercer-pieds-de-r%C3%A9duction-sur-le-simulateur-pour-des-adducteurs-56988382.jpg" },
             { id: "abductors", nom: "Abducteurs Machine", reps: "2x15", note: "Renfort fessiers.", img: "https://static.strengthlevel.com/images/exercises/hip-abduction/hip-abduction-800.jpg" }
         ],
         fullbody: [
@@ -402,18 +402,40 @@ const appModule = (function() {
     }
 
     function renderWeightChart() {
-        const svg = document.getElementById('weight-chart'); if(!svg || state.weight.length < 2) return;
-        const w=380, h=150, p=20; 
+        const svg = document.getElementById('weight-chart'); 
+        if(!svg || state.weight.length < 2) return;
+        
+        const w = 380, h = 220, pTop = 20, pBottom = 40, pLeft = 45, pRight = 20; 
         const values = state.weight.map(d => parseFloat(d.val));
         const maxW = Math.max(...values, 102) + 2;
         const minW = Math.min(...values, 80) - 2;
         
         const pts = state.weight.map((d, i) => {
-            const x = (i/(state.weight.length-1))*(w-2*p)+p;
-            const y = h-((parseFloat(d.val)-minW)/(maxW-minW))*(h-2*p)-p;
+            const x = (i/(state.weight.length-1))*(w - pLeft - pRight) + pLeft;
+            const y = h - ((parseFloat(d.val)-minW)/(maxW-minW))*(h - pTop - pBottom) - pBottom;
             return `${x},${y}`;
         }).join(' ');
-        svg.innerHTML = `<line x1="${p}" y1="${h-p}" x2="${w-p}" y2="${h-p}" stroke="#eee" /><polyline points="${pts}" fill="none" stroke="var(--accent-rose)" stroke-width="3" stroke-linecap="round" />`;
+        
+        let axes = `
+            <line x1="${pLeft}" y1="${h-pBottom}" x2="${w-pRight}" y2="${h-pBottom}" stroke="#eee" stroke-width="1" />
+            <line x1="${pLeft}" y1="${pTop}" x2="${pLeft}" y2="${h-pBottom}" stroke="#eee" stroke-width="1" />
+            <text x="${w/2 + pLeft/2}" y="${h-5}" text-anchor="middle" font-size="10" fill="#aaa">Date</text>
+            <text x="10" y="${h/2}" text-anchor="middle" font-size="10" fill="#aaa" transform="rotate(-90 10 ${h/2})">Poids (kg)</text>
+        `;
+        
+        // Labels Y
+        axes += `<text x="${pLeft-5}" y="${pTop+5}" text-anchor="end" font-size="9" fill="#ccc">${maxW.toFixed(0)}</text>`;
+        axes += `<text x="${pLeft-5}" y="${h-pBottom}" text-anchor="end" font-size="9" fill="#ccc">${minW.toFixed(0)}</text>`;
+        
+        // Labels X (Dates)
+        if(state.weight.length > 0) {
+            const firstDate = new Date(state.weight[0].date).toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
+            const lastDate = new Date(state.weight[state.weight.length-1].date).toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
+            axes += `<text x="${pLeft}" y="${h-pBottom+15}" text-anchor="middle" font-size="9" fill="#ccc">${firstDate}</text>`;
+            axes += `<text x="${w-pRight}" y="${h-pBottom+15}" text-anchor="middle" font-size="9" fill="#ccc">${lastDate}</text>`;
+        }
+
+        svg.innerHTML = axes + `<polyline points="${pts}" fill="none" stroke="var(--accent-rose)" stroke-width="3" stroke-linecap="round" />`;
     }
 
     function renderForceChart(id) {
@@ -422,16 +444,37 @@ const appModule = (function() {
         const data = state.exerciseHistory[id] || [];
         if (!svg || data.length < 2) { if(container) container.classList.add('hidden'); return; }
         if(container) container.classList.remove('hidden');
-        const w = 380, h = 160, p = 40;
+
+        const w = 380, h = 220, pTop = 20, pBottom = 40, pLeft = 45, pRight = 20;
         const weights = data.map(d => parseFloat(d.weight));
         const maxW = Math.max(...weights) + 5;
         const minW = Math.max(0, Math.min(...weights) - 5);
+        
         const pts = data.map((d, i) => {
-            const x = (i / (data.length - 1)) * (w - 2 * p) + p;
-            const y = h - ((parseFloat(d.weight) - minW) / (maxW - minW)) * (h - 2 * p) - p;
+            const x = (i / (data.length - 1)) * (w - pLeft - pRight) + pLeft;
+            const y = h - ((parseFloat(d.weight) - minW) / (maxW - minW)) * (h - pTop - pBottom) - pBottom;
             return `${x},${y}`;
         }).join(' ');
-        svg.innerHTML = `<line x1="${p}" y1="${h-p}" x2="${w-p}" y2="${h-p}" stroke="#eee" /><line x1="${p}" y1="${p}" x2="${p}" y2="${h-p}" stroke="#eee" /><polyline points="${pts}" fill="none" stroke="var(--accent-rose-dark)" stroke-width="3" stroke-linecap="round" />${data.map((d, i) => { const x=(i/(data.length-1))*(w-2*p)+p; const y=h-((parseFloat(d.weight)-minW)/(maxW-minW))*(h-2*p)-p; return `<circle cx="${x}" cy="${y}" r="4" fill="white" stroke="var(--accent-rose-dark)" stroke-width="2" />`; }).join('')}`;
+
+        let axes = `
+            <line x1="${pLeft}" y1="${h - pBottom}" x2="${w - pRight}" y2="${h - pBottom}" stroke="#eee" />
+            <line x1="${pLeft}" y1="${pTop}" x2="${pLeft}" y2="${h - pBottom}" stroke="#eee" />
+            <text x="${w/2 + pLeft/2}" y="${h-5}" text-anchor="middle" font-size="10" fill="#aaa">Séances</text>
+            <text x="10" y="${h/2}" text-anchor="middle" font-size="10" fill="#aaa" transform="rotate(-90 10 ${h/2})">Charge (kg)</text>
+        `;
+
+        // Labels Y
+        axes += `<text x="${pLeft-5}" y="${pTop+5}" text-anchor="end" font-size="9" fill="#ccc">${maxW.toFixed(0)}</text>`;
+        axes += `<text x="${pLeft-5}" y="${h-pBottom}" text-anchor="end" font-size="9" fill="#ccc">${minW.toFixed(0)}</text>`;
+
+        svg.innerHTML = axes + `
+            <polyline points="${pts}" fill="none" stroke="var(--accent-rose-dark)" stroke-width="3" stroke-linecap="round" />
+            ${data.map((d, i) => {
+                const x = (i / (data.length - 1)) * (w - pLeft - pRight) + pLeft;
+                const y = h - ((parseFloat(d.weight) - minW) / (maxW - minW)) * (h - pTop - pBottom) - pBottom;
+                return `<circle cx="${x}" cy="${y}" r="4" fill="white" stroke="var(--accent-rose-dark)" stroke-width="2" />`;
+            }).join('')}
+        `;
     }
 
     function populateExerciseSelect() {
@@ -443,7 +486,6 @@ const appModule = (function() {
         all.forEach(ex => { if(!unique.has(ex.id)){ const o=document.createElement('option'); o.value=ex.id; o.innerText=ex.nom; if(ex.id === currentVal) o.selected = true; sel.appendChild(o); unique.add(ex.id); }});
     }
 
-    // FONCTION LECTURE INITIALE
     async function loadDataOnStart() {
         const uid = state.user.uid;
         const weightRef = collection(db, 'artifacts', appId, 'users', uid, 'weight_history');
@@ -557,7 +599,6 @@ const appModule = (function() {
                 await addDoc(collection(db, 'artifacts', appId, 'users', state.user.uid, 'weight_history'), { val: parseFloat(i.value), date: new Date().toISOString() });
                 i.value = "";
                 showToast("Poids enregistré ! ✨");
-                // On rafraîchit immédiatement le graphique localement
                 const uid = state.user.uid;
                 const snap = await getDocs(query(collection(db, 'artifacts', appId, 'users', uid, 'weight_history')));
                 state.weight = snap.docs.map(d => d.data()).sort((a,b) => new Date(a.date) - new Date(b.date));
